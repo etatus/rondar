@@ -1,0 +1,37 @@
+{
+	"background_color": "#FFFFFF",
+	"description": "Rondar",
+	"dir": "ltr",
+	"display": "standalone",
+	"icons": [{
+			"sizes": "48x48",
+			"src": "/images/favicon-48x48.png",
+			"type": "image/png"
+		}, {
+			"sizes": "72x72",
+			"src": "/images/favicon-72x72.png",
+			"type": "image/png"
+		}, {
+			"sizes": "96x96",
+			"src": "/images/favicon-96x96.png",
+			"type": "image/png"
+		}, {
+			"sizes": "144x144",
+			"src": "/images/favicon-144x144.png",
+			"type": "image/png"
+		}, {
+			"sizes": "192x192",
+			"src": "/images/favicon-192x192.png",
+			"type": "image/png"
+		}, {
+			"sizes": "512x512",
+			"src": "/images/favicon-512x512.png",
+			"type": "image/png"
+		}
+	],
+	"lang": "es-ES",
+	"name": "rondar",
+	"short_name": "rondar",
+	"start_url": "/index.html",
+	"theme_color": "#ff7417"
+}

@@ -1,0 +1,84 @@
+/* Custom Stylesheet */
+/**
+ * Use this file to override Materialize files so you can update
+ * the core Materialize files in the future
+ *
+ * Made By MaterializeCSS.com
+ */
+
+.icon-block {
+  padding: 0 15px;
+}
+.icon-block .material-icons {
+	font-size: inherit;
+}
+
+.text-bold {
+	font-weight: bolder;
+}
+
+nav .logo {
+    height: 100%;
+	font-size: 1rem;
+}
+
+nav .logo>img {
+    max-width: 100%;
+    max-height: 100%;
+	vertical-align: middle;
+}
+
+input[type=text]:not(.browser-default):focus:not([readonly]) {
+	border-bottom: 1px solid #047da3;
+    -webkit-box-shadow: 0 1px 0 0 #047da3;
+    box-shadow: 0 1px 0 0 #047da3;
+}
+
+.input-field .prefix.active {
+  color: #047da3;
+}
+
+/* label focus color */
+.input-field input[type=text]:focus + label {
+	color: #047da3 !important;
+}
+
+.route-number {
+  display: inline-block;
+  width: 40px;
+  text-align: center;
+  color: white;
+  font-size: 22px;
+  font-weight: 600;
+  line-height: 40px;
+  border-radius: 20px;
+  /*margin:5px;*/
+  background: #ff7417;
+}
+
+.route-line {
+  background: url('../images/line.png') repeat-y center top;
+  padding: 0;
+  margin: 0;
+}
+
+.route-title {
+    font-size: 18px;
+    line-height: 20px;
+	font-weight: 400;
+	margin: 0 5px;
+}
+
+.route-header {
+    font-size: 26px;
+    line-height: 28px;
+    font-weight: 600;
+    margin: 20px 0 60px 0;
+}
+
+
+.map-button {
+    bottom: 20px;
+    position: fixed;
+    right: 20px;
+}
