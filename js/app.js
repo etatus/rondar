@@ -13,9 +13,9 @@ function calculateRouteFromAtoB (platform) {
     routeRequestParams = {
       mode: 'shortest;pedestrian',
       representation: 'display',
-      waypoint0: '42.220629669616,-8.732678938707', 
-      waypoint1: '42.223952824828,-8.730501699085', 
-      waypoint2: '42.217363810184,-8.737892854643', 
+      waypoint0: '42.430847884649,-8.648626030161', 
+      waypoint1: '42.434915884995,-8.643584001564', 
+      waypoint2: '42.431764617121,-8.648568734382', 
       routeattributes: 'waypoints,summary,shape,legs',
       maneuverattributes: 'direction,action'
     };
