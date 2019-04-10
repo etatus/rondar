@@ -12,14 +12,18 @@ function calculateRouteFromAtoB (platform) {
   var router = platform.getRoutingService(),
     routeRequestParams = {
       mode: 'shortest;pedestrian',
+	  language: 'es-es',
       representation: 'display',
-      waypoint0: '42.430847884649,-8.648626030161', 
-      waypoint1: '42.434915884995,-8.643584001564', 
-      waypoint2: '42.431764617121,-8.648568734382', 
+//      waypoint0: '42.430847884649,-8.648626030161', 
+//      waypoint1: '42.434915884995,-8.643584001564', 
+//      waypoint2: '42.431764617121,-8.648568734382', 
       routeattributes: 'waypoints,summary,shape,legs',
       maneuverattributes: 'direction,action'
     };
-
+	
+  for (i in pois_coords) {
+	  routeRequestParams["waypoint"+i] = "stopOver!"+pois_coords[i].lat+","+pois_coords[i].lon+";;"+pois_coords[i].name;
+  }
 
   router.calculateRoute(
     routeRequestParams,
@@ -44,8 +48,8 @@ function onSuccess(result) {
   addManueversToMap(route);
 
   addWaypointsToPanel(route.waypoint);
-  addManueversToPanel(route);
   addSummaryToPanel(route.summary);
+  addManueversToPanel(route);
   // ... etc.
 }
 
@@ -67,8 +71,8 @@ function onError(error) {
 
 //Step 1: initialize communication with the platform
 var platform = new H.service.Platform({
-  app_id: '<HERE APP ID>',
-  app_code: '<HERE APP CODE>',
+  app_id: 'a9RKm5Fa4kEa2vEHd8XS',
+  app_code: 'NHuB7LqkY3Y7MTdW7kuPhQ',
   useCIT: true,
   useHTTPS: true
 });
@@ -200,19 +204,19 @@ function addWaypointsToPanel(waypoints){
 
 
 
-  var nodeH4 = document.createElement('h4'),
+  var nodeH5 = document.createElement('h5'),
     waypointLabels = [],
     i;
 
 
    for (i = 0;  i < waypoints.length; i += 1) {
-    waypointLabels.push(waypoints[i].label)
+    waypointLabels.push(waypoints[i].userLabel)
    }
 
-   nodeH4.textContent = waypointLabels.join(' - ');
+   nodeH5.textContent = waypointLabels.join(' - ');
 
   routeInstructionsContainer.innerHTML = '';
-  routeInstructionsContainer.appendChild(nodeH4);
+  routeInstructionsContainer.appendChild(nodeH5);
 }
 
 /**
@@ -224,7 +228,7 @@ function addSummaryToPanel(summary){
    content = '<br/>';
    content += '<b>Distancia total</b>: ' + summary.distance  + ' metros <br/>';
    content += '<b>Tiempo del recorrido</b>: ' + summary.travelTime.toMMSS(); // + ' (in current traffic)';
-   content += '<br/><br/>';
+   content += '<br/>';
 
 
   summaryDiv.style.fontSize = 'large';
@@ -337,4 +341,52 @@ function geo_onError(error) {
    M.toast({html: 'Ocurrió un error validando la dirección. Por favor, pruebe otra vez.'});
 }
 
+/*
+ * Note that the places module https://js.api.here.com/v3/3.0/mapsjs-places.js
+ * must be loaded to use the Places API endpoints
+ *
+ * @param   {H.service.Platform} platform    A stub class to access HERE services
+ */
+function placesNearby(platform) {
+  var here = new H.places.Here(platform.getPlacesService());
+  // List of parameters passed to the Explore entrypoint
+  var params = {
+    'at': direccion_coords //'42.2833337,-8.743231999999999'
+  };
+  // Creating a here request with parameters and callbacks
+  here.request(params, {}, near_onResult, near_onError);
+}
 
+
+/**
+ * This function will be called once the Places REST API provides a response
+ * @param  {Object} result          A JSONP object representing the  location(s) found.
+ *
+ * see: http://developer.here.com/rest-apis/documentation/places/topics_api/media-type-search.html
+ */
+function near_onResult(result) {
+  var places = result.results.items;
+  /*
+   * The styling of the places response on the map is entirely under the developer's control.
+   * A representative styling can be found the full JS + HTML code of this example
+   * in the functions below:
+   */
+  //addPlacesToMap(places);
+  //addPlacesToPanel(places);
+}
+
+
+/**
+ * Boilerplate map initialization code starts below:
+ */
+
+
+/**
+ * This function will be called if a communication error occurs during the JSON-P request
+ * @param  {Object} error  The error message received.
+ *
+ * see: http://developer.here.com/rest-apis/documentation/places/topics_api/object-error.html
+ */
+function near_onError(error) {
+  error = data;
+}

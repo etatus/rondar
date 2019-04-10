@@ -1,19 +1,29 @@
 (function($){
   $(function(){
-
     $('.sidenav').sidenav();
-	$('#mapa').hide();
+	if (navigator.geolocation) {
+		navigator.geolocation.getCurrentPosition(showPosition);
+	} else {
+		console.log("Geolocation no soportada por el navegador");
+	}
   }); // end of document ready
 })(jQuery); // end of jQuery name space
 
 var contenido_itinerario = "";
 var direccion = "";
+var direccion_coords;
 var id_provincia = 0;
 var lat;
-var lon;
+var pois_coords = [];
+
+function showPosition(position) {
+	console.log("Lat: " + position.coords.latitude + " Lon: " + position.coords.longitude);
+	direccion_coords = position.coords.latitude + "," + position.coords.longitude;
+	placesNearby(platform);
+}
 
 function mostrar_itinerario() {
-	if (id_provincia != 0) calcular_itinerario(null);
+	if (id_provincia != 0) 	$('#contenido').html(contenido_itinerario); //calcular_itinerario(null);
 	else if ($('#direccion').val() == undefined || $('#direccion').val() == "") M.toast({html: 'Debe introducirse una dirección de salida.'});
 	else geocode(platform,$('#direccion').val());	
 }
@@ -28,19 +38,36 @@ function calcular_itinerario(locations) {
 
 	var sun_patterns = ["ADF","ABCDF","EF","ABCF","CEF","ACD","ABCF"];
 	var rain_patterns = ["ADF","ABCDF","AD","ABCF","ACEF","ACD","ABCF"];
-	// TODO: Determinar si hace sol en la ubicación de salida
 
 	if (lat == null) {
 		lat = locations[0].location.displayPosition.latitude;
 		lon = locations[0].location.displayPosition.longitude;
 	}
-	var dist = 1000;
-	var api_key = '<MINUBE API KEY>';
 	
-	var contenido_itinerario = '<div class="row"><div class="col s12"><div class="route-header">Itinerario desde '+direccion+'<div></div></div>';
+	var patterns = sun_patterns;
+	var weather_icon = "wb_sunny";
+	// DarkSky API
+	console.log("proxies/darksky_proxy.php?coords="+encodeURIComponent(lat+","+lon));
+	$.ajax({type: "GET",url: "proxies/darksky_proxy.php?coords="+encodeURIComponent(lat+","+lon), async: false})
+			.done(function(data) {
+				console.log("Precipitacions: "+data.currently.precipType);
+				if (data.currently.precipType) {
+					patters = rain_patterns;
+					weather_icon = "cloud";
+				}
+			})
+			.fail(function() {
+	
+			})	
+	
+	var dist = 1000;
+	var api_key = '<MINUBE API KEY>'; // Minube -> Trasladada al proxy PHP
+	
+	contenido_itinerario = '<div class="row"><div class="col s12"><div class="route-header"><i class="small material-icons">'+weather_icon+'</i> Itinerario recomendado desde '+direccion+'<div></div></div>';
 	 
 	cont = 0;
 	items = false;
+	pois_coords = [];
 	for (p in sun_patterns) {
 		cat = -1;
 		cont++;
@@ -50,33 +77,38 @@ function calcular_itinerario(locations) {
 			}						
 		}
 		if (cat > -1) {
-			console.log("minube_proxy.php?url="+encodeURIComponent("http://papi.minube.com/pois?lang=es&country_id=63&zone_id="+id_provincia+"&subcategory_id="+cat+"&latitude="+lat+"&longitude="+lon+"&max_distance="+dist+"&min_distance=0&page=0&api_key="+api_key));
-			$.ajax({type: "GET",url: "minube_proxy.php?url="+encodeURIComponent("http://papi.minube.com/pois?lang=es&country_id=63&zone_id="+id_provincia+"&subcategory_id="+cat+"&latitude="+lat+"&longitude="+lon+"&max_distance="+dist+"&min_distance=0&page=0&api_key="+api_key), async: false})
+			//console.log("proxies/minube_proxy.php?url="+encodeURIComponent("http://papi.minube.com/pois?lang=es&country_id=63&zone_id="+id_provincia+"&subcategory_id="+cat+"&latitude="+lat+"&longitude="+lon+"&max_distance="+dist+"&min_distance=0&page=0&api_key="+api_key));
+			$.ajax({type: "GET",url: "proxies/minube_proxy.php?url="+encodeURIComponent("http://papi.minube.com/pois?lang=es&country_id=63&zone_id="+id_provincia+"&subcategory_id="+cat+"&latitude="+lat+"&longitude="+lon+"&max_distance="+dist+"&min_distance=0&page=0"), async: false})
 			.done(function(data) {
 				var pois = data;
-				if (data.length == 0) {					
+				if (pois.length == 0) {					
 					//contenido_itinerario += '<div class="row"><div class="col s12 center"><h5>Lo siento, no se han encontrado puntos de interés en la ubicación indicada</h5></div>';
 					contenido_itinerario += '<div class="row">';
 					contenido_itinerario += '	  <div class="col s2 center route-line"><div class="route-number">'+cont+'</div></div>';
 					contenido_itinerario += '	  <div class="col s5 center"><div class="route-title">No hay puntos de interés del tipo deseado</div></div>';
-					contenido_itinerario += '	  <div class="col s5 center"><img src="/images/no-image.png" class="z-depth-3" style="max-width: 100%"/></div>';
+					contenido_itinerario += '	  <div class="col s5 center"><img src="images/no-image.jpg" class="z-depth-3" style="max-width: 100%"/></div>';
 					contenido_itinerario += '	</div>';
 					//console.log(pois[j].name+" lat: "+pois[j].latitude+", lon: "+pois[j].longitude);					
-				}else items = true;
-
-				for (var j in pois) {
+				}else {
+					items = true;
+					var j = Math.floor(Math.random()*pois.length);
+					var image_url = "images/no-image.png";
+					if (pois[j].picture_url && pois[j].picture_url != '') image_url = pois[j].picture_url;
+				//for (var j in pois) {
 					contenido_itinerario += '<div class="row">';
 					contenido_itinerario += '	  <div class="col s2 center route-line"><div class="route-number">'+cont+'</div></div>';
 					contenido_itinerario += '	  <div class="col s5 center"><div class="route-title">'+pois[j].name+'</div></div>';
-					contenido_itinerario += '	  <div class="col s5 center"><img src="'+pois[j].picture_url+'" class="z-depth-3" style="max-width: 100%"/></div>';
+					contenido_itinerario += '	  <div class="col s5 center"><img src="'+image_url+'" class="materialboxed z-depth-3" style="max-width: 100%"/></div>';
 					contenido_itinerario += '	</div>';
 					console.log(pois[j].name+" lat: "+pois[j].latitude+", lon: "+pois[j].longitude);
-					break; // Solo queremos uno (deberia ser el mas relevante)
+					pois_coords.push({"name":pois[j].name,"lat":pois[j].latitude,"lon":pois[j].longitude});
+					//break; // Solo queremos uno (deberia ser el mas relevante)
+				//}
 				}
 			})
 			.fail(function() {
 				var contenido_itinerario = '<div class="row"><div class="col s12"><div class="route-header red-text">Error buscando puntos de interés!<div></div></div>';
-				$('#contenido').html(contenido_itinerario);	
+				$('#contenido').html(contenido_itinerario);
 				id_provincia = 0;
 				direccion = "";
 				lat = null;		
@@ -86,7 +118,7 @@ function calcular_itinerario(locations) {
 	}
 	if (items) contenido_itinerario += '<a href="javascript:void(0);" onclick="mostrar_mapa()" class="btn-floating btn-large waves-effect waves-light cyan darken-3 right map-button pulse"><i class="material-icons">map</i></a>';
 	$('#contenido').html(contenido_itinerario);
-
+	$('.materialboxed').materialbox();
 	//id_provincia = 0;
 	//direccion = "";
 	//lat = null;
