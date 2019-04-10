@@ -7,6 +7,14 @@
 	} else {
 		console.log("Geolocation no soportada por el navegador");
 	}
+	$('#direccion').keydown(function(event) {
+    // enter has keyCode = 13, change it if you want to use another button
+    if (event.keyCode == 13) {
+		$('#direccion').val();
+		mostrar_itinerario();
+		return false;
+    }
+  });
   }); // end of document ready
 })(jQuery); // end of jQuery name space
 
@@ -28,8 +36,6 @@ function showPosition(position) {
 	 */
 
 	//Step 1: initialize communication with the platform
-
-	var defaultLayers = platform.createDefaultLayers();
 
 	var defaultLayers = platform.createDefaultLayers();
 
