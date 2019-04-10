@@ -2,6 +2,7 @@
   $(function(){
     $('.sidenav').sidenav();
 	$('#map').hide();
+	$('#loading').hide();
 	if (navigator.geolocation) {
 		navigator.geolocation.getCurrentPosition(showPosition);
 	} else {
@@ -65,7 +66,11 @@ function showPosition(position) {
 function mostrar_itinerario() {
 	if (id_provincia != 0) 	$('#contenido').html(contenido_itinerario); //calcular_itinerario(null);
 	else if ($('#direccion').val() == undefined || $('#direccion').val() == "") M.toast({html: 'Debe introducirse una dirección de salida.'});
-	else geocode(platform,$('#direccion').val());	
+	else {
+		$('#calculate-button').hide();
+		$('#loading').show();
+		geocode(platform,$('#direccion').val());	
+	}
 }
 
 function calcular_itinerario(locations) {

@@ -71,8 +71,10 @@ function onError(error) {
 
 //Step 1: initialize communication with the platform
 var platform = new H.service.Platform({
-  app_id: '<HERE APP ID>',
-  app_code: '<HERE APP CODE>',
+//  app_id: '<HERE APP ID>',
+//  app_code: '<HERE APP CODE>',
+  app_id: 'a9RKm5Fa4kEa2vEHd8XS',
+  app_code: 'NHuB7LqkY3Y7MTdW7kuPhQ',
   useCIT: true,
   useHTTPS: true
 });
