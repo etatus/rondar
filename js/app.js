@@ -71,8 +71,8 @@ function onError(error) {
 
 //Step 1: initialize communication with the platform
 var platform = new H.service.Platform({
-  app_id: 'a9RKm5Fa4kEa2vEHd8XS',
-  app_code: 'NHuB7LqkY3Y7MTdW7kuPhQ',
+  app_id: '<HERE APP ID>',
+  app_code: '<HERE APP CODE>',
   useCIT: true,
   useHTTPS: true
 });
@@ -347,11 +347,11 @@ function geo_onError(error) {
  *
  * @param   {H.service.Platform} platform    A stub class to access HERE services
  */
-function placesNearby(platform) {
+function placesNearby(platform,lat,lon) {
   var here = new H.places.Here(platform.getPlacesService());
   // List of parameters passed to the Explore entrypoint
   var params = {
-    'at': direccion_coords //'42.2833337,-8.743231999999999'
+    'at': lat+","+lon //'42.2833337,-8.743231999999999'
   };
   // Creating a here request with parameters and callbacks
   here.request(params, {}, near_onResult, near_onError);
@@ -366,6 +366,10 @@ function placesNearby(platform) {
  */
 function near_onResult(result) {
   var places = result.results.items;
+  if (places.length > 0) {
+	  $('#direccion').val(places[0].title);
+	  //console.log("places: "+places[0].title);
+  }
   /*
    * The styling of the places response on the map is entirely under the developer's control.
    * A representative styling can be found the full JS + HTML code of this example
@@ -388,5 +392,123 @@ function near_onResult(result) {
  * see: http://developer.here.com/rest-apis/documentation/places/topics_api/object-error.html
  */
 function near_onError(error) {
-  error = data;
+  //error = data;
+}
+
+/**
+ * Moves the map to display over Berlin
+ *
+ * @param  {H.Map} map      A HERE Map instance within the application
+ */
+function moveMapToLocation(map,lat,lon){
+  //map.setCenter({lat:52.5159, lng:13.3777});
+  map.setCenter({lat:lat, lng:lon});
+  map.setZoom(14);
+}
+
+
+/**
+ * Adds a  draggable marker to the map..
+ *
+ * @param {H.Map} map                      A HERE Map instance within the
+ *                                         application
+ * @param {H.mapevents.Behavior} behavior  Behavior implements
+ *                                         default interactions for pan/zoom
+ */
+function addDraggableMarker(map, behavior, lat, lon){
+
+  var marker = new H.map.Marker({lat:lat, lng:lon});
+  // Ensure that the marker can receive drag events
+  marker.draggable = true;
+  map.addObject(marker);
+
+  // disable the default draggability of the underlying map
+  // when starting to drag a marker object:
+  map.addEventListener('dragstart', function(ev) {
+    var target = ev.target;
+    if (target instanceof H.map.Marker) {
+      behavior.disable();
+    }
+  }, false);
+
+
+  // re-enable the default draggability of the underlying map
+  // when dragging has completed
+  map.addEventListener('dragend', function(ev) {
+    var target = ev.target;
+    if (target instanceof mapsjs.map.Marker) {
+      behavior.enable();
+	  //placesNearby(platform,target.getPosition().lat,target.getPosition().lng);
+	  reverseGeocode(platform,target.getPosition().lat,target.getPosition().lng);
+    }      
+  }, false);
+
+  // Listen to the drag event and move the position of the marker
+  // as necessary
+   map.addEventListener('drag', function(ev) {
+    var target = ev.target,
+        pointer = ev.currentPointer;
+    if (target instanceof mapsjs.map.Marker) {
+      target.setPosition(map.screenToGeo(pointer.viewportX, pointer.viewportY));
+    }
+  }, false);
+}
+
+/**
+ * Calculates and displays the address details of the location found at
+ * a specified location in Berlin (52.5309°N 13.3847°E) using a 150 meter
+ * radius to retrieve the address of Nokia House. The expected address is:
+ * Invalidenstraße 116, 10115 Berlin.
+ *
+ *
+ * A full list of available request parameters can be found in the Geocoder API documentation.
+ * see: http://developer.here.com/rest-apis/documentation/geocoder/topics/resource-reverse-geocode.html
+ *
+ * @param   {H.service.Platform} platform    A stub class to access HERE services
+ */
+function reverseGeocode(platform,lat,lon) {
+  var geocoder = platform.getGeocodingService(),
+    reverseGeocodingParameters = {
+      prox: lat+","+lon,//'52.5309,13.3847,150', // Berlin
+      mode: 'retrieveAddresses',
+      maxresults: '1',
+      jsonattributes : 1
+    };
+
+  geocoder.reverseGeocode(
+    reverseGeocodingParameters,
+    rev_onSuccess,
+    rev_onError
+  );
+}
+
+/**
+ * This function will be called once the Geocoder REST API provides a response
+ * @param  {Object} result          A JSONP object representing the  location(s) found.
+ *
+ * see: http://developer.here.com/rest-apis/documentation/geocoder/topics/resource-type-response-geocode.html
+ */
+function rev_onSuccess(result) {
+  var locations = result.response.view[0].result;
+  if (locations.length > 0) {
+	  $('#direccion').val(locations[0].location.address.label);
+	  $('#direccion').focus();
+	  //console.log("places: "+places[0].title);
+  }  
+ /*
+  * The styling of the geocoding response on the map is entirely under the developer's control.
+  * A representitive styling can be found the full JS + HTML code of this example
+  * in the functions below:
+  */
+  //addLocationsToMap(locations);
+  //addLocationsToPanel(locations);
+  // ... etc.
+}
+
+/**
+ * This function will be called if a communication error occurs during the JSON-P request
+ * @param  {Object} error  The error message received.
+ */
+function rev_onError(error) {
+  alert('Ooops!');
 }

@@ -65,7 +65,7 @@ input[type=text]:not(.browser-default):focus:not([readonly]) {
 .route-title {
     font-size: 18px;
     line-height: 20px;
-	font-weight: 400;
+	font-weight: 500;
 	margin: 0 5px;
 }
 
