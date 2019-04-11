@@ -65,8 +65,10 @@ function showPosition(position) {
 }
 
 function mostrar_itinerario() {
-	if (id_provincia != 0) 	$('#contenido').html(contenido_itinerario); //calcular_itinerario(null);
-	else if ($('#direccion').val() == undefined || $('#direccion').val() == "") M.toast({html: 'Debe introducirse una dirección de salida.'});
+	if (id_provincia != 0) 	{
+		$('#contenido').html(contenido_itinerario); //calcular_itinerario(null);
+		$('.materialboxed').materialbox();
+	}else if ($('#direccion').val() == undefined || $('#direccion').val() == "") M.toast({html: 'Debe introducirse una dirección de salida.'});
 	else {
 		$('#calculate-button').hide();
 		$('#loading').show();
