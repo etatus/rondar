@@ -10,16 +10,83 @@
 		console.log("Geolocation no soportada por el navegador");
 	}
 	$('#direccion').keydown(function(event) {
-    // enter has keyCode = 13, change it if you want to use another button
-    if (event.keyCode == 13) {
-		$('#direccion').val();
-		mostrar_itinerario();
-		return false;
-    }
-  });
+		// enter has keyCode = 13, change it if you want to use another button
+		if (event.keyCode == 13) {
+			mostrar_itinerario();
+			return false;
+		}
+	});
+
+/* 	$('#direccion').on("focus", function () {
+	   $(this).select();
+	}); */
+
+ 	$('#direccion').on("focusout", function () {
+	   if ($('#direccion').val() == "") $('#direccion').val(" ");
+	}); 
+	
+	try {
+		/*-----------------------------
+			  Voice Recognition 
+		------------------------------*/
+		var SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+		recognition = new SpeechRecognition();
+		// If false, the recording will stop after a few seconds of silence.
+		// When true, the silence period is longer (about 15 seconds),
+		// allowing us to keep recording even when the user pauses. 
+		recognition.continuous = false;	 
+
+		// This block is called every time the Speech APi captures a line. 
+		recognition.onresult = function(event) {
+
+		  // event is a SpeechRecognitionEvent object.
+		  // It holds all the lines we have captured so far. 
+		  // We only need the current one.
+		  var current = event.resultIndex;
+
+		  // Get a transcript of what was said.
+		  var transcript = event.results[current][0].transcript;
+
+		  // Add the current transcript to the contents of our Note.
+		  // There is a weird bug on mobile, where everything is repeated twice.
+		  // There is no official solution so far so we have to handle an edge case.
+		  var mobileRepeatBug = (current == 1 && transcript == event.results[0][0].transcript);
+
+		  if(!mobileRepeatBug) {
+			if ($('#direccion').val() == " ") $('#direccion').val(transcript);
+			else $('#direccion').val($('#direccion').val()+transcript);
+			//$('#direccion').focus();
+		  }
+		};
+
+		recognition.onstart = function() { 
+		  $("#micro").addClass("pulse disabled");
+		  //instructions.text('Voice recognition activated. Try speaking into the microphone.');
+		}
+
+		recognition.onspeechend = function() {
+		  $("#micro").removeClass("pulse disabled");
+		  //instructions.text('You were quiet for a while so voice recognition turned itself off.');
+		}
+
+		recognition.onerror = function(event) {
+		  if(event.error == 'no-speech') {
+			$("#micro").removeClass("pulse disabled");
+			M.toast({html: 'No se ha detectado voz. Por favor, inténtelo otra vez.'})
+			//instructions.text('No speech was detected. Try again.');  
+		  };
+		}	
+	
+	}
+	catch(e) {
+	  console.error(e);
+	  $('#micro_div').hide();
+	}	
+		
   }); // end of document ready
 })(jQuery); // end of jQuery name space
 
+var recognition;
 var contenido_itinerario = "";
 var direccion = "";
 //var direccion_coords;
@@ -27,6 +94,14 @@ var id_provincia = 0;
 var ini_lat,ini_lon;
 var lat,lon;
 var pois_coords = [];
+
+
+function startRecognition() {
+  if ($('#direccion').val() != "") {
+    $('#direccion').val($('#direccion').val()+" ");
+  }   
+  recognition.start();
+}
 
 function showPosition(position) {
 	console.log("Lat: " + position.coords.latitude + " Lon: " + position.coords.longitude);
