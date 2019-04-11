@@ -1,6 +1,7 @@
 (function($){
   $(function(){
     $('.sidenav').sidenav();
+	$('.modal').modal();
 	$('#map').hide();
 	$('#loading').hide();
 	if (navigator.geolocation) {
