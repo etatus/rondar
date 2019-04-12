@@ -318,7 +318,7 @@ function geocode(platform,direccion) {
  * see: http://developer.here.com/rest-apis/documentation/geocoder/topics/resource-type-response-geocode.html
  */
 function geo_onSuccess(result) {
-  if (result.response.view[0] == undefined) {
+  if (result.response == undefined || result.response.view[0] == undefined) {
 	  M.toast({html: 'Dirección no encontrada!<br/>Intenta escribirla de otra forma.'});
   } else {
 	  var locations = result.response.view[0].result;
@@ -494,7 +494,7 @@ function rev_onSuccess(result) {
   var locations = result.response.view[0].result;
   if (locations.length > 0) {
 	  $('#direccion').val(locations[0].location.address.label);
-	  $('#direccion').focus();
+	  //$('#direccion').focus();
 	  //console.log("places: "+places[0].title);
   }  
  /*

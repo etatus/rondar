@@ -17,9 +17,9 @@
 		}
 	});
 
-/* 	$('#direccion').on("focus", function () {
+ 	$('#direccion').on("focus", function () {
 	   $(this).select();
-	}); */
+	}); 
 
  	$('#direccion').on("focusout", function () {
 	   if ($('#direccion').val() == "") $('#direccion').val(" ");
@@ -97,9 +97,10 @@ var pois_coords = [];
 
 
 function startRecognition() {
-  if ($('#direccion').val() != "") {
+/*   if ($('#direccion').val() != "") {
     $('#direccion').val($('#direccion').val()+" ");
-  }   
+  }  */  
+  $('#direccion').val(" ");
   recognition.start();
 }
 
@@ -143,7 +144,7 @@ function mostrar_itinerario() {
 	if (id_provincia != 0) 	{
 		$('#contenido').html(contenido_itinerario); //calcular_itinerario(null);
 		$('.materialboxed').materialbox();
-	}else if ($('#direccion').val() == undefined || $('#direccion').val() == "") M.toast({html: 'Debe introducirse una dirección de salida.'});
+	}else if ($('#direccion').val() == undefined || $('#direccion').val().trim() == "") M.toast({html: 'Debe introducirse una dirección de salida.'});
 	else {
 		$('#calculate-button').hide();
 		$('#loading').show();
