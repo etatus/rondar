@@ -318,6 +318,8 @@ function geocode(platform,direccion) {
 function geo_onSuccess(result) {
   if (result.response == undefined || result.response.view[0] == undefined) {
 	  M.toast({html: 'Dirección no encontrada!<br/>Intenta escribirla de otra forma.'});
+	  $('#calculate-button').show();
+	  $('#loading').hide();
   } else {
 	  var locations = result.response.view[0].result;
 	  calcular_itinerario(locations);
@@ -339,6 +341,8 @@ function geo_onSuccess(result) {
 function geo_onError(error) {
   //alert('Ooops!');
    M.toast({html: 'Ocurrió un error validando la dirección. Por favor, pruebe otra vez.'});
+   $('#calculate-button').show();
+   $('#loading').hide();
 }
 
 /*

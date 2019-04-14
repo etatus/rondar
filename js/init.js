@@ -56,6 +56,9 @@
 			if ($('#direccion').val() == " ") $('#direccion').val(transcript);
 			else $('#direccion').val($('#direccion').val()+transcript);
 			//$('#direccion').focus();
+			$('#calculate-button').hide();
+			$('#loading').show();
+			geocode(platform,$('#direccion').val());				
 		  }
 		};
 
@@ -105,7 +108,11 @@ function startRecognition() {
 }
 
 function showPosition(position) {
+	
 	console.log("Lat: " + position.coords.latitude + " Lon: " + position.coords.longitude);
+	//lat = position.coords.latitude;
+	//lon = position.coords.longitude;
+	
 	$('#map').show();
 	//placesNearby(platform,position.coords.latitude,position.coords.longitude);
 	reverseGeocode(platform,position.coords.latitude,position.coords.longitude);
